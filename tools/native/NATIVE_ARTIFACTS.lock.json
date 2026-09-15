@@ -1,0 +1,353 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-13",
+  "policy": {
+    "minimumLoadAlignment": 16384,
+    "blocking64BitAbis": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "allAbis": [
+      "armeabi-v7a",
+      "arm64-v8a",
+      "x86",
+      "x86_64"
+    ],
+    "expectedElf": {
+      "armeabi-v7a": {
+        "class": "ELF32",
+        "machine": "ARM"
+      },
+      "arm64-v8a": {
+        "class": "ELF64",
+        "machine": "AArch64"
+      },
+      "x86": {
+        "class": "ELF32",
+        "machine": "Intel 80386"
+      },
+      "x86_64": {
+        "class": "ELF64",
+        "machine": "Advanced Micro Devices X86-64"
+      }
+    },
+    "maximumZipEntryBytes": 1073741824,
+    "maximumZipTotalBytes": 2147483648,
+    "maximumCompressionRatio": 10000,
+    "androidSystemLibraries": [
+      "libEGL.so",
+      "libGLESv1_CM.so",
+      "libGLESv2.so",
+      "libGLESv3.so",
+      "libOpenSLES.so",
+      "libaaudio.so",
+      "libamidi.so",
+      "libandroid.so",
+      "libcamera2ndk.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libnativewindow.so",
+      "libneuralnetworks.so",
+      "libsync.so",
+      "libvulkan.so",
+      "libz.so"
+    ]
+  },
+  "inventory": {
+    "gradleBuildFile": "app/build.gradle.kts",
+    "directSharedObjectRoot": "app/src/main/jniLibs",
+    "doviArchivePattern": "DV7/libdovi/android-*/lib/libdovi.a",
+    "excludedGeneratedRoots": [
+      ".gradle",
+      "app/.cxx",
+      "build",
+      "**/build"
+    ],
+    "excludedResolvedInputs": [
+      "Maven/Gradle cache payloads, including MPV and ass-media",
+      "Chaquopy interpreter and wheel payloads",
+      "generated CMake outputs unless supplied explicitly",
+      "final APK payload unless supplied with --apk"
+    ]
+  },
+  "doviContract": {
+    "gradleBuildFile": "app/build.gradle.kts",
+    "kotlinFile": "app/src/main/java/com/foxtv/app/core/player/DoviBridge.kt",
+    "kotlinFqcn": "com.foxtv.app.core.player.DoviBridge",
+    "sourceFile": "app/src/main/cpp/dovi_bridge.cpp",
+    "cmakeFile": "app/src/main/cpp/CMakeLists.txt",
+    "expectedJniSymbols": [
+      "Java_com_foxtv_app_core_player_DoviBridge_nativeGetBridgeVersion",
+      "Java_com_foxtv_app_core_player_DoviBridge_nativeIsConversionPathReady",
+      "Java_com_foxtv_app_core_player_DoviBridge_nativeConvertDv7RpuToDv81",
+      "Java_com_foxtv_app_core_player_DoviBridge_nativeConvertDv7RpuToDv81NonAllocating",
+      "Java_com_foxtv_app_core_player_DoviBridge_nativeProcessVideoSample"
+    ],
+    "forbiddenJniPrefixes": [
+      "Java_com_playtorrio_tv_core_player_DoviBridge_"
+    ],
+    "requiredArchiveSymbols": [
+      "dovi_parse_unspec62_nalu",
+      "dovi_parse_rpu",
+      "dovi_rpu_get_error",
+      "dovi_rpu_free",
+      "dovi_convert_rpu_with_mode",
+      "dovi_write_unspec62_nalu",
+      "dovi_data_free"
+    ]
+  },
+  "ffmpegSourceModeContract": {
+    "settingsFile": "settings.gradle.kts",
+    "appBuildFile": "app/build.gradle.kts",
+    "moduleBuildFile": "ffmpeg-decoder-downmix/build.gradle.kts",
+    "cmakeFile": "ffmpeg-decoder-downmix/src/main/jni/CMakeLists.txt",
+    "builderFile": "ffmpeg-decoder-downmix/src/main/jni/build_ffmpeg.sh",
+    "expectedTag": "n7.1.5",
+    "expectedCommit": "3a0867c2bfda4a4d4309ca1a8cbdc6175e67f587",
+    "expectedNdkRevision": "28.2.13676358",
+    "expectedAndroidApi": "24",
+    "expectedDecoders": [
+      "aac",
+      "mp3",
+      "ac3",
+      "eac3",
+      "truehd",
+      "dca",
+      "vorbis",
+      "opus",
+      "amrnb",
+      "amrwb",
+      "flac",
+      "alac",
+      "pcm_mulaw",
+      "pcm_alaw",
+      "h264",
+      "hevc"
+    ]
+  },
+  "artifacts": [
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-common-release.aar",
+      "sha256": "a01729509ff920e273ee696fc2cdf99ec073b9b5dc039c4d8dec72aa61bcb447",
+      "consumer": "forkowany Media3 common / player",
+      "provenanceStatus": "partial",
+      "provenance": "API jest przypięte do Media3 1.8.0; brak dokładnego commitu i receptury lokalnego forka",
+      "nativeEntries": {}
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-datasource-release.aar",
+      "sha256": "5375c0ff43784d210a69e7bfc438b9da9b2f42d6fb3b967ddae9b55902c7bf3d",
+      "consumer": "forkowany Media3 datasource / player cache",
+      "provenanceStatus": "partial",
+      "provenance": "API jest przypięte do Media3 1.8.0; brak dokładnego commitu i receptury lokalnego forka",
+      "nativeEntries": {}
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-datasource-okhttp-release.aar",
+      "sha256": "ba71ce4326b6bab3b06991ef1bbf50dd2205e5f65ae72fed1802858a99b10617",
+      "consumer": "forkowany Media3 datasource OkHttp / player network",
+      "provenanceStatus": "partial",
+      "provenance": "API jest przypięte do Media3 1.8.0; brak dokładnego commitu i receptury lokalnego forka",
+      "nativeEntries": {}
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-exoplayer-release.aar",
+      "sha256": "b4a9e7052a2d9d06fa164f0232cd9bb714ca8fc77ba7f03a2fb4f951fbf374e7",
+      "consumer": "forkowany Media3 ExoPlayer / główny player",
+      "provenanceStatus": "partial",
+      "provenance": "API jest przypięte do Media3 1.8.0; brak dokładnego commitu i receptury lokalnego forka",
+      "nativeEntries": {
+        "jni/arm64-v8a/libmedia3_exoplayer_jni.so": "dc324385009b61ed08255c7e9fd9ca308e6003c7cc4b2e025effd0423fbc5e1d",
+        "jni/armeabi-v7a/libmedia3_exoplayer_jni.so": "8dd36826b1d7e9304d75249db77b43107c5fd1c0ad3678d5a77fdb6ac922dc5f",
+        "jni/x86/libmedia3_exoplayer_jni.so": "4db38e3589bbd72c6a50653b4bff8947780e1e4d207b8684ba5b93c1da2c17bc",
+        "jni/x86_64/libmedia3_exoplayer_jni.so": "216b9b99078fea38e86c31f5c55d2c20a12b9bbde555cf1ee561f70c2ad744c6"
+      }
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-exoplayer-hls-release.aar",
+      "sha256": "826cbaddd86d9ff5165db4bbf7e0951490533351152bfff34e98e61b9b5f5119",
+      "consumer": "forkowany Media3 HLS / player",
+      "provenanceStatus": "partial",
+      "provenance": "API jest przypięte do Media3 1.8.0; brak dokładnego commitu i receptury lokalnego forka",
+      "nativeEntries": {}
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-extractor-release.aar",
+      "sha256": "bb8eec291549eb5760ef16d78fb964e1faf0303f71fc033a0ef691aad4eb5798",
+      "consumer": "forkowany Media3 extractor / player",
+      "provenanceStatus": "partial",
+      "provenance": "API jest przypięte do Media3 1.8.0; brak dokładnego commitu i receptury lokalnego forka",
+      "nativeEntries": {}
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-decoder-av1-release.aar",
+      "sha256": "e4f929a8132fdd2e9f8f65ad731c5e27f9251eced72aab3138e4520ab0e13e5f",
+      "consumer": "Media3 AV1 extension renderer",
+      "provenanceStatus": "gap",
+      "provenance": "brak dokładnego source tag/commit i reprodukowalnej receptury",
+      "nativeEntries": {
+        "jni/arm64-v8a/libgav1JNI.so": "9acc16714913c0498001ba52c315cefdc4773bcb70a88b92a6cf5b87e00ac7f3",
+        "jni/armeabi-v7a/libgav1JNI.so": "d2e92b9b68ef1a21555f9b54b5e314f4ad8fa41d630dc94145bf95ece4e3533e",
+        "jni/x86/libgav1JNI.so": "8177befef640690bbc032423b678cb3e6209aec5e31b3405cec57d6a34c9f600",
+        "jni/x86_64/libgav1JNI.so": "16de899c7b1445fcca571150ef8b96cc8757eda60a48502930c4c8cb6ae81cca"
+      }
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-decoder-mpegh-release.aar",
+      "sha256": "e21884ef2f0e88b97a6baa0442d3e63696d64fd6743c30675661501d9079b114",
+      "consumer": "Media3 MPEG-H extension renderer",
+      "provenanceStatus": "gap",
+      "provenance": "brak dokładnego source tag/commit i reprodukowalnej receptury",
+      "nativeEntries": {
+        "jni/arm64-v8a/libmpeghJNI.so": "abb121b6e5a4d692fb0f1ff50e1309ffb1d44e287d5a8161b39435868b0ed19a",
+        "jni/armeabi-v7a/libmpeghJNI.so": "f1ebe197d7263f6094f0f6176a6c30cb8254df4f021e2a860f613bb887188b6c",
+        "jni/x86/libmpeghJNI.so": "6127aba9cd9a645762a5f2188c004315c3b64ec173a5f5bc1ea4fb0dd97a046c",
+        "jni/x86_64/libmpeghJNI.so": "63856c29fe12773e2598b2dbe16a3c626f21124cbf20367f7903ed1a65fc1d5e"
+      }
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-decoder-iamf-release.aar",
+      "sha256": "c6fd3e65f8e4f343ddd6edb1ca4fb6dfa37f669afd5af4ab760995e6e03083d1",
+      "consumer": "Media3 IAMF extension renderer",
+      "provenanceStatus": "verified",
+      "provenance": "Media3 1.8.0 b7bbc6e2bc3e45ff3ed99884c114c50f03bba5c9 + libiamf v1.1.0 f06e919e2ad5502a2adc4bdd4e146f2e7e7ffb63; tools/native/iamf",
+      "nativeEntries": {
+        "jni/arm64-v8a/libiamf.so": "4c4ff5b34476f901c5c9ee125504734ed6d272cfb0d3818a628630ef0cd718af",
+        "jni/arm64-v8a/libiamfJNI.so": "bebe86e2b564b84e93f1e3fc334a021b3e103876af9a2519ebfc4eac94857bf3",
+        "jni/armeabi-v7a/libiamf.so": "7c1c79cdb68ec4ce46e72fe5ba33cf2b57c1b13c40c26274d3fc25fe96083fa3",
+        "jni/armeabi-v7a/libiamfJNI.so": "67ee9223320e3a6013f75aa3267a3105b0342f47c6d8e1ac7ddcdc3273e0af4e",
+        "jni/x86/libiamf.so": "b7c54a1f7c61bb7d0a73f5e1bace858a7450fa036cf53ef0471558185fe9d7e9",
+        "jni/x86/libiamfJNI.so": "4ac2e4efd4c79d9a9a9cf6eb8b7b86580fd038ab9d111d621c4cb6f163616f41",
+        "jni/x86_64/libiamf.so": "e74610893b780c756ba5b95942239efb03b180f509bbc88ce34909087e4a140d",
+        "jni/x86_64/libiamfJNI.so": "5f593155dc3df8b4162a7edbee7f6f2f4dc651a46b28b389aae3f04a8746f780"
+      }
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/lib-decoder-ffmpeg-release.aar",
+      "sha256": "c88b83a15c1f89dd94006e185520a5c2b2703e58a4938f5a4a975af960584fb1",
+      "consumer": "domyślny Media3 FFmpeg audio renderer",
+      "provenanceStatus": "gap",
+      "provenance": "binarium raportuje Lavc61.3.100; dokładny source commit i build recipe są nieustalone",
+      "nativeEntries": {
+        "jni/arm64-v8a/libffmpegJNI.so": "e942fe3b38d26addcd9e914e60a621d475f9744ec641f1e75e4f066452eedbab",
+        "jni/armeabi-v7a/libffmpegJNI.so": "5d371b32f9b72c3504f38f377e5055bd74f81cb6408d79fc541c28405b849fef",
+        "jni/x86/libffmpegJNI.so": "8b74ea420beba7cca88417f6be6e4a0ab44533793d026d83286732ecaa8ddd4f",
+        "jni/x86_64/libffmpegJNI.so": "400153a49add535939d3dc9fa3336402e0c3e9f3eb765dcfd52fd333abe307ce"
+      }
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/nextlib-mediainfo-local.aar",
+      "sha256": "509e645e0f4232bdd3c6e1b2e4b82c3686140a0355f13656890f3641d8b7fb53",
+      "consumer": "NextLib MediaInfo / frame-rate probe",
+      "provenanceStatus": "gap",
+      "provenance": "lokalny fork ze statycznym FFmpeg; brak dokładnego source commit i receptury",
+      "nativeEntries": {
+        "jni/arm64-v8a/libmediainfo.so": "8117b11b21676d27622df124bc65844842d0bff6cadcf7f5410c2a3597e621e5",
+        "jni/armeabi-v7a/libmediainfo.so": "9037fcf556d7cf746408570f059100ecd66dd64c7a136842f7cb459e7f7e3043",
+        "jni/x86/libmediainfo.so": "9752f5041a88350034c44ca2c5975b62e33d88980ee5c0cdf91fb53aecede79e",
+        "jni/x86_64/libmediainfo.so": "fd7eabfa4bd98618a8bb41db31d999651ce892400d93b55122fdee5bd069d69c"
+      }
+    },
+    {
+      "kind": "aar",
+      "path": "app/libs/quickjs-kt-android-1.0.5-playtorrio.aar",
+      "sha256": "7bbafcaf3c94feac4a329c9861f5ffc1bf470841a28a34c3c305f801cb7948ab",
+      "consumer": "Cloudstream JavaScript plugin runtime",
+      "provenanceStatus": "gap",
+      "provenance": "patched 1.0.5; brak patch diff, source commit i reprodukowalnej receptury",
+      "nativeEntries": {
+        "jni/arm64-v8a/libquickjs.so": "71c9a016739f1801a0979173a2b2a7ee15ed691ee37fc0201b77eac69a27a004",
+        "jni/armeabi-v7a/libquickjs.so": "9d64a2ef7398cb731720d438b2faf3356507b6a84d3c1f7328f9702e902f20c8",
+        "jni/x86/libquickjs.so": "576c30041d2a6def0d8b272b74982a1b22688228d97ac1e8a1176c1b5de83aa5",
+        "jni/x86_64/libquickjs.so": "96104c4af959349c42d8707d60e9495a7b79b84d55abe53d0c83459aa1425646"
+      }
+    },
+    {
+      "kind": "executable-elf",
+      "path": "app/src/main/jniLibs/armeabi-v7a/libtorrserver.so",
+      "sha256": "201175365022e9630ca3931c5289872709893fbb3d21f6c4882ad3c9e043f833",
+      "abi": "armeabi-v7a",
+      "consumer": "TorrServerBinary / osobny proces",
+      "provenanceStatus": "gap",
+      "provenance": "TorrServer MatriX, widoczne Go 1.25.6; brak wiarygodnego tagu, commitu i rebuild recipe"
+    },
+    {
+      "kind": "executable-elf",
+      "path": "app/src/main/jniLibs/arm64-v8a/libtorrserver.so",
+      "sha256": "99bc134caf93ac69bf183b0c0403b1a4ca8dccfde3604ddaa8f1f013f8cfa86f",
+      "abi": "arm64-v8a",
+      "consumer": "TorrServerBinary / osobny proces",
+      "provenanceStatus": "gap",
+      "provenance": "TorrServer MatriX, widoczne Go 1.25.6; brak wiarygodnego tagu, commitu i rebuild recipe"
+    },
+    {
+      "kind": "executable-elf",
+      "path": "app/src/main/jniLibs/x86/libtorrserver.so",
+      "sha256": "1f534c9e9348df6129d5c638b10318e75bcee869d1036b841f065e5dd9cce728",
+      "abi": "x86",
+      "consumer": "TorrServerBinary / osobny proces",
+      "provenanceStatus": "gap",
+      "provenance": "TorrServer MatriX, widoczne Go 1.25.6; brak wiarygodnego tagu, commitu i rebuild recipe"
+    },
+    {
+      "kind": "executable-elf",
+      "path": "app/src/main/jniLibs/x86_64/libtorrserver.so",
+      "sha256": "6548eae266e01a4d8c8c691b5861081bb0f5d5249f2e7efdc88ceb405f7c1aff",
+      "abi": "x86_64",
+      "consumer": "TorrServerBinary / osobny proces",
+      "provenanceStatus": "gap",
+      "provenance": "TorrServer MatriX, widoczne Go 1.25.6; brak wiarygodnego tagu, commitu i rebuild recipe"
+    },
+    {
+      "kind": "static-archive",
+      "path": "DV7/libdovi/android-arm64/lib/libdovi.a",
+      "sha256": "f1bfa001b911f166fc9520dd6017bd4b15b652cdb2929f6b42d6b7fcbe750fbd",
+      "abi": "arm64-v8a",
+      "consumer": "libdovi_bridge.so",
+      "provenanceStatus": "gap",
+      "provenance": "Rust staticlib z wymaganym C API; brak wersji, commitu i rebuild recipe"
+    },
+    {
+      "kind": "static-archive",
+      "path": "DV7/libdovi/android-armeabi-v7a/lib/libdovi.a",
+      "sha256": "b5e713bc18fc47ba0a5bb81216e2734bdbd1c5fe75ced28594c9cec6aef8a2fc",
+      "abi": "armeabi-v7a",
+      "consumer": "libdovi_bridge.so",
+      "provenanceStatus": "gap",
+      "provenance": "Rust staticlib z wymaganym C API; brak wersji, commitu i rebuild recipe"
+    },
+    {
+      "kind": "static-archive",
+      "path": "DV7/libdovi/android-x86/lib/libdovi.a",
+      "sha256": "0bc0381a6481672c63fa88b4b1a1a6e10625542d840b91f73b56cd40424db19f",
+      "abi": "x86",
+      "consumer": "libdovi_bridge.so",
+      "provenanceStatus": "gap",
+      "provenance": "Rust staticlib z wymaganym C API; brak wersji, commitu i rebuild recipe"
+    },
+    {
+      "kind": "static-archive",
+      "path": "DV7/libdovi/android-x86_64/lib/libdovi.a",
+      "sha256": "614b7afde11a743b2bdf658857ded2e9844ff471a3b00888a4c022d1716d9795",
+      "abi": "x86_64",
+      "consumer": "libdovi_bridge.so",
+      "provenanceStatus": "gap",
+      "provenance": "Rust staticlib z wymaganym C API; brak wersji, commitu i rebuild recipe"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:6
+#EXTINF:6.0,
+segment-1.ts
+#EXTINF:6.0,
+segment-2.ts
+#EXT-X-ENDLIST

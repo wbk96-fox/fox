@@ -1,0 +1,19 @@
+diff --git a/libraries/decoder_iamf/src/main/jni/CMakeLists.txt b/libraries/decoder_iamf/src/main/jni/CMakeLists.txt
+index 78f8aef..8b5e28c 100644
+--- a/libraries/decoder_iamf/src/main/jni/CMakeLists.txt
++++ b/libraries/decoder_iamf/src/main/jni/CMakeLists.txt
+@@ -45,6 +45,12 @@ target_link_libraries(iamfJNI
+                       PRIVATE iamf
+                       PRIVATE ${android_log_lib})
+ 
+-# Enable 16 KB ELF alignment.
++# Require 16 KB ELF alignment for both the decoder core and JNI wrapper.
++# NDK r28 aligns 64-bit targets by default, but its 32-bit targets still need
++# explicit linker options when all four packaged ABIs are audited uniformly.
++target_link_options(iamf
++                    PRIVATE "-Wl,-z,max-page-size=16384"
++                    PRIVATE "-Wl,-z,common-page-size=16384")
+ target_link_options(iamfJNI
+-                    PRIVATE "-Wl,-z,max-page-size=16384")
++                    PRIVATE "-Wl,-z,max-page-size=16384"
++                    PRIVATE "-Wl,-z,common-page-size=16384")

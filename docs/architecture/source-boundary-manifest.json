@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "generated": "2026-09-14",
+  "branch": "foxtv/enterprise-impl",
+  "base_commit": "20806f2",
+  "gradle_modules": {
+    "always": [":app", ":baselineprofile"],
+    "conditional": [{ "path": ":ffmpeg-decoder-downmix", "flag": "includeFfmpegDecoderProject", "audit_only_prebuild": "fail-closed" }]
+  },
+  "included_builds": [],
+  "source_roots": [
+    { "path": "app/src/main/java", "files": 957, "classification": "SOURCE", "packages": ["com.foxtv.app (production)", "com.lagradost.cloudstream3 (vendored, MUST-KEEP names)", "eu.kanade.tachiyomi (vendored Aniyomi host, Apache-2.0)", "uy.kohesive.injekt (vendored Injekt, MIT, pin 65b04400cf379aa952dce00443f57b81f9a936ea)"] },
+    { "path": "app/src/test/java", "files": 219, "classification": "TEST_SOURCE" },
+    { "path": "app/src/androidTest/java", "files": 9, "classification": "TEST_SOURCE", "note": "live gate foxtvLiveAnime; poza check/unit/release" },
+    { "path": "app/src/main/python", "files": 29, "classification": "SOURCE", "note": "Chaquopy 17.0.0 + Python 3.11; foxtv_fanfilm bridge + vendored pyqrcode (BSD)" },
+    { "path": "app/src/main/cpp", "files": 2, "classification": "SOURCE", "note": "dovi_bridge.cpp + CMakeLists.txt; fail-closed" },
+    { "path": "ffmpeg-decoder-downmix", "files": 281, "classification": "SOURCE+TOOLING", "note": "warunkowy moduł; FFmpeg n7.1.5 pinned" },
+    { "path": "baselineprofile", "files": 3, "classification": "TEST_SOURCE" }
+  ],
+  "native_artifacts": [
+    { "path": "app/libs", "items": 12, "classification": "LOCAL_DEPENDENCY", "note": "10 AAR fork Media3 + nextlib-mediainfo-local + quickjs-kt-android-1.0.5-playtorrio" },
+    { "path": "app/src/main/jniLibs", "items": 4, "classification": "NATIVE_ARTIFACT", "note": "TorrServer MatriX.141, static Go executables, 4 ABI" },
+    { "path": "DV7", "items": 8, "classification": "NATIVE_ARTIFACT", "note": "statyczne libdovi.a 4 ABI + nagłówki" }
+  ],
+  "vendored_assets": [
+    { "path": "app/src/main/assets/fanfilm", "classification": "VENDORED_SOURCE", "addons": ["plugin.video.fanfilm 2026.09.06.1", "script.fanfilm.media", "script.module.resolveurl 5.1.208", "script.module.kodi-six", "script.module.inputstreamhelper 0.8.6"], "manifest": "MANIFEST.json (sha256)" },
+    { "path": "app/src/main/assets/licenses", "classification": "DOCUMENTATION" }
+  ],
+  "unknown_blocking": [
+    { "id": "UNKNOWN-1", "path": "org/libtorrent4j/swig/byte_vector.class", "reason": "osierocony plik .class poza source root; 0 referencji w app sources i Gradle; śledzony w git", "required_decision": "REMOVE (kandydat silny) lub DOCUMENTATION przy dowodzie pochodzenia" },
+    { "id": "UNKNOWN-2", "path": "assets/brand/{app_logo_mark.png,app_logo_wordmark.png}", "reason": "brak konsumentów w scripts/tools/app; produkcyjny branding w app/src/main/res", "required_decision": "TOOLING_INPUT (udokumentować) albo REMOVE" }
+  ],
+  "non_truth_paths": ["build/", ".gradle/", "app/build/", "**/CMakeFiles/", "**/*.o", "**/*.class", "**/generated/", "**/intermediates/", "reports"]
+}

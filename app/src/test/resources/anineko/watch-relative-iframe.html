@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<!-- AniNeko watch fixture: relative iframe resolved against the final watch URL,
+     a scheme-relative sub button, a dub button with an absolute HLS data-video that
+     carries query parameters, and an identical duplicated sub button that must be
+     deduplicated by the extractor's raw-string list. -->
+<html>
+<head><title>Watch</title></head>
+<body>
+<div class="nv-watch-page" id="player"></div>
+<div class="tabs">
+  <span class="nv-server-tab tab_1" data-id="1">SUB</span>
+  <span class="nv-server-tab tab_2" data-id="2">DUB</span>
+</div>
+<iframe src="player-frame.html"></iframe>
+<button class="server-video" data-tab="tab_1" data-video="//__HOST__/embed/scheme-relative.html">SUB</button>
+<button class="server-video" data-tab="tab_1" data-video="//__HOST__/embed/scheme-relative.html">SUB copy</button>
+<button class="server-video" data-tab="tab_2" data-video="__BASE__hls/dub-direct.m3u8?token=dubfixture">DUB</button>
+</body>
+</html>

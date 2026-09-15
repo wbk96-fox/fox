@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_fanfilm">FanFilm</string>
+
+    <string name="action_ok">OK</string>
+    <string name="action_yes">Yes</string>
+    <string name="action_no">No</string>
+
+    <string name="fanfilm_title">FanFilm</string>
+    <string name="fanfilm_starting">Starting FanFilm…</string>
+    <string name="fanfilm_loading">Loading FanFilm…</string>
+    <string name="fanfilm_empty">This FanFilm folder is empty.</string>
+    <string name="fanfilm_settings_title">FanFilm Settings</string>
+    <string name="fanfilm_scanning">Scanning FanFilm sources… %1$d%%</string>
+    <string name="fanfilm_scanning_providers">Providers: %1$s</string>
+
+    <string name="fanfilm_error_configuration">FanFilm configuration error: %1$s</string>
+    <string name="fanfilm_error_plugin">FanFilm plugin error: %1$s</string>
+    <string name="fanfilm_error_no_sources">FanFilm found no playable sources.</string>
+    <string name="fanfilm_error_resolver">No resolver produced a playable stream for %1$s.</string>
+    <string name="fanfilm_error_network">FanFilm network error: %1$s</string>
+    <string name="fanfilm_error_drm">This source requires unsupported DRM (%1$s).</string>
+    <string name="fanfilm_error_playback">FanFilm could not start playback: %1$s</string>
+    <string name="fanfilm_error_busy">FanFilm is busy with another request. Try again shortly.</string>
+    <string name="fanfilm_error_update">FanFilm update failed: %1$s</string>
+
+    <string name="fanfilm_settings_unavailable">FanFilm settings are unavailable.</string>
+    <string name="fanfilm_updates_title">FanFilm Updates</string>
+    <string name="fanfilm_updates_checking">Checking…</string>
+    <string name="fanfilm_updates_check">Check for updates</string>
+    <string name="fanfilm_updates_restart_required">%1$s %2$s is staged. Restart FOX.TV to activate the update.</string>
+    <string name="fanfilm_updates_rollback">Roll back</string>
+    <string name="fanfilm_updates_updating">Updating…</string>
+    <string name="fanfilm_updates_update">Update</string>
+    <string name="fanfilm_settings_action_run">Run</string>
+</resources>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<!-- AniNeko search fixture: two links share the same /watch/ slug so the extractor's
+     slug deduplication collapses them into one candidate; the link text must clean-match
+     the queried title for the search fallback to select the series. -->
+<html>
+<head><title>Browser - Search Fixture Title</title></head>
+<body>
+<div class="nv-browser">
+  <a href="/watch/fixture-series/">Search Fixture Title</a>
+  <a href="/watch/other-series/ep-1">Other Show - Episode 1</a>
+  <a href="/watch/fixture-series/">Search Fixture Title</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+# Exact Gradle-managed tooling components which are resolved outside project lock states.
+# Human-readable evidence, hashes, provenance boundary and upgrade decision:
+# gradle/DETACHED_TOOLING_AUDIT.md
+# Format: group:name:version<TAB>comma-separated verification-metadata artifact names
+#
+# The component/artifact counts are asserted in build.gradle.kts (parseDetachedToolingManifest:
+# entries.size == 15, artifactCount == 28) so that any drift in the AGP/KSP tooling graph fails
+# the build instead of silently widening the audited surface.
+#
+# REGENERATION (required whenever the AGP or KSP anchor in gradle/libs.versions.toml changes,
+# even for a patch bump, because the lint/AAPT2 transitive set may change):
+#   1. ./gradlew --stop
+#   2. Resolve the new tooling with verification recording so Gradle writes the real hashes:
+#      ./gradlew --write-verification-metadata sha256 :app:assembleDebug :app:lintDebug \
+#        --max-workers=1 --no-parallel --no-daemon --console=plain
+#   3. Diff gradle/verification-metadata.xml and list every component that has no lock-state
+#      owner (task-created/detached selections: AAPT2, KSP embeddable processor, AGP lint stack
+#      and its transitive tooling). Those are the components that belong in this manifest.
+#   4. Update the rows below to the exact resolved versions and the exact artifact names present
+#      in the regenerated verification metadata (one SHA-256 per artifact, no ranges/SNAPSHOTs).
+#   5. Update entries.size / artifactCount and the AGP/KSP anchor checks in build.gradle.kts to
+#      the new reviewed counts, then re-run:
+#      ./gradlew verifyDependencySupplyChain --dependency-verification=strict \
+#        --max-workers=1 --no-parallel --no-daemon --console=plain
+#   6. Review the diff: a changed count is a supply-chain change and needs a human decision,
+#      not a mechanical count bump.
+com.android.tools.build:aapt2:8.13.2-14304508	aapt2-8.13.2-14304508-linux.jar,aapt2-8.13.2-14304508.pom
+com.google.devtools.ksp:symbol-processing-aa-embeddable:2.3.12	symbol-processing-aa-embeddable-2.3.12.jar,symbol-processing-aa-embeddable-2.3.12.pom
+com.android.tools:play-sdk-proto:31.13.2	play-sdk-proto-31.13.2.jar,play-sdk-proto-31.13.2.pom
+com.android.tools.external.com-intellij:intellij-core:31.13.2	intellij-core-31.13.2.jar,intellij-core-31.13.2.pom
+com.android.tools.external.com-intellij:kotlin-compiler:31.13.2	kotlin-compiler-31.13.2.jar,kotlin-compiler-31.13.2.pom
+com.android.tools.external.org-jetbrains:uast:31.13.2	uast-31.13.2.jar,uast-31.13.2.pom
+com.android.tools.lint:lint:31.13.2	lint-31.13.2.jar,lint-31.13.2.pom
+com.android.tools.lint:lint-api:31.13.2	lint-api-31.13.2.jar,lint-api-31.13.2.pom
+com.android.tools.lint:lint-checks:31.13.2	lint-checks-31.13.2.jar,lint-checks-31.13.2.pom
+com.android.tools.lint:lint-gradle:31.13.2	lint-gradle-31.13.2.jar,lint-gradle-31.13.2.pom
+commons-codec:commons-codec:1.10	commons-codec-1.10.jar,commons-codec-1.10.pom
+org.apache:apache:15	apache-15.pom
+org.apache.commons:commons-parent:35	commons-parent-35.pom
+org.apache.httpcomponents:httpclient:4.5.6	httpclient-4.5.6.jar,httpclient-4.5.6.pom
+org.codehaus.groovy:groovy:3.0.22	groovy-3.0.22.jar,groovy-3.0.22.pom

@@ -1,0 +1,668 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window xmlns:ff="ff">
+  <ff:defines>
+
+    <macro name="alternatives_button">
+      <param name="top" value="" />
+      <param name="right" value="20" />
+      <param name="onup" value="{120 + n - 1}" />
+      <param name="ondown" value="{120 + n + 1}" />
+      <param name="onleft" value="{100 + n}" />
+      <param name="onright" value="{100 + n}" />
+      <control type="group">
+        <height>64</height>
+        <width>64</width>
+        <right>{right}</right>
+        <left />
+        <top>{top or (10 + (n-1) * 80)}</top>
+        <bottom />
+        <control type="button" id="{120 + n}">
+          <height />
+          <width />
+          <right>0</right>
+          <left>0</left>
+          <top>0</top>
+          <bottom>0</bottom>
+          <aligny>center</aligny>
+          <align>center</align>
+          <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+          <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+          <colordiffuse />
+          <onleft>{onleft}</onleft>
+          <onright>{onright}</onright>
+          <onup>{onup}</onup>
+          <ondown>{ondown}</ondown>
+        </control>
+        <control type="image">
+          <height>52</height>
+          <width>52</width>
+          <top>6</top>
+          <left>6</left>
+          <right />
+          <bottom />
+          <aligny>center</aligny>
+          <align>center</align>
+          <texture colordiffuse="B3FFFFFF">icons/list.32.png</texture>
+        </control>
+      </control>
+    </macro>
+
+    <macro name="badge.modified">
+      <param name="top" value="" />
+      <param name="left" value="-15" />
+      <param name="bottom" value="" />
+      <param name="right" value="" />
+      <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.{key}),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>{top}</top>
+        <left>{left}</left>
+        <right>{right}</right>
+        <bottom>{bottom}</bottom>
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+    </macro>
+
+  </ff:defines>
+
+  <coordinates>
+    <top>0</top>
+    <left>0</left>
+    <width>1920</width>
+    <height>1080</height>
+  </coordinates>
+  <defaultcontrol>31</defaultcontrol>
+
+  <controls>
+    <control type="image">
+      <top />
+      <left />
+      <width>1920</width>
+      <height>1080</height>
+      <texture border="10" colordiffuse="BF000000">white.png</texture>
+    </control>
+
+    <control type="group">
+      <centertop>50%</centertop>
+      <centerleft>50%</centerleft>
+      <top />
+      <left />
+      <width>1400</width>
+      <height>820</height>
+      <font>font_title</font>
+      <control type="image">
+        <colordiffuse>D9202E39</colordiffuse>
+        <texture border="20">dialogs/rounded.png</texture>
+      </control>
+      <control type="image">
+        <colordiffuse>D9141519</colordiffuse>
+        <texture border="20">dialogs/rounded.png</texture>
+        <bordersize>4</bordersize>
+      </control>
+
+      <control type="label">
+        <centerleft>50%</centerleft>
+        <left />
+        <top>20</top>
+        <height>50</height>
+        <align>center</align>
+        <textcolor>B3FFFFFF</textcolor>
+        <font ff:style="heading">font_title_small</font>
+        <label>$ADDON[plugin.video.fanfilm 30257]</label>
+      </control>
+
+      <control type="image">
+        <colordiffuse>D9202E39</colordiffuse>
+        <texture border="2">white.png</texture>
+        <height>2</height>
+        <width>1350</width>
+        <top>90</top>
+        <centerleft>50%</centerleft>
+        <left />
+      </control>
+
+      <control type="group">
+        <left>40</left>
+        <right>50</right>
+        <top>120</top>
+        <bottom>170</bottom>
+
+
+
+
+        <control type="edit" id="101">
+          <top>0</top>
+          <left>0</left>
+          <right>90</right>
+          <height>80</height>
+          <align>left</align>
+          <width />
+          <aligny>center</aligny>
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label>$ADDON[plugin.video.fanfilm 30258]</label>
+          <hinttext>Title</hinttext>
+          <onup>31</onup>
+          <ondown>102</ondown>
+          <onright>121</onright>
+          <textoffsetx>25</textoffsetx>
+          <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+          <texturenofocus />
+        </control>
+        <control type="group">
+        <height>64</height>
+        <width>64</width>
+        <right>20</right>
+        <left />
+        <top>10</top>
+        <bottom />
+        <control type="button" id="121">
+          <height />
+          <width />
+          <right>0</right>
+          <left>0</left>
+          <top>0</top>
+          <bottom>0</bottom>
+          <aligny>center</aligny>
+          <align>center</align>
+          <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+          <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+          <colordiffuse />
+          <onleft>101</onleft>
+          <onright>101</onright>
+          <onup>31</onup>
+          <ondown>122</ondown>
+        </control>
+        <control type="image">
+          <height>52</height>
+          <width>52</width>
+          <top>6</top>
+          <left>6</left>
+          <right />
+          <bottom />
+          <aligny>center</aligny>
+          <align>center</align>
+          <texture colordiffuse="B3FFFFFF">icons/list.32.png</texture>
+        </control>
+      </control>
+        <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.localtitle),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>15</top>
+        <left>-15</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+        <control type="edit" id="102">
+          <top>80</top>
+          <left>0</left>
+          <right>90</right>
+          <height>80</height>
+          <align>left</align>
+          <width />
+          <aligny>center</aligny>
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label>$ADDON[plugin.video.fanfilm 30259]</label>
+          <hinttext>Title</hinttext>
+          <onup>101</onup>
+          <ondown>103</ondown>
+          <onleft>122</onleft>
+          <onright>122</onright>
+          <textoffsetx>25</textoffsetx>
+          <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+          <texturenofocus />
+        </control>
+        <control type="group">
+        <height>64</height>
+        <width>64</width>
+        <right>20</right>
+        <left />
+        <top>90</top>
+        <bottom />
+        <control type="button" id="122">
+          <height />
+          <width />
+          <right>0</right>
+          <left>0</left>
+          <top>0</top>
+          <bottom>0</bottom>
+          <aligny>center</aligny>
+          <align>center</align>
+          <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+          <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+          <colordiffuse />
+          <onleft>102</onleft>
+          <onright>102</onright>
+          <onup>121</onup>
+          <ondown>123</ondown>
+        </control>
+        <control type="image">
+          <height>52</height>
+          <width>52</width>
+          <top>6</top>
+          <left>6</left>
+          <right />
+          <bottom />
+          <aligny>center</aligny>
+          <align>center</align>
+          <texture colordiffuse="B3FFFFFF">icons/list.32.png</texture>
+        </control>
+      </control>
+        <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.title),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>95</top>
+        <left>-15</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+        <control type="edit" id="103">
+          <top>160</top>
+          <left>0</left>
+          <right>90</right>
+          <height>80</height>
+          <align>left</align>
+          <width />
+          <aligny>center</aligny>
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label>$ADDON[plugin.video.fanfilm 30260]</label>
+          <hinttext>Title</hinttext>
+          <onup>102</onup>
+          <ondown>104</ondown>
+          <onleft>123</onleft>
+          <onright>123</onright>
+          <textoffsetx>25</textoffsetx>
+          <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+          <texturenofocus />
+        </control>
+        <control type="group">
+        <height>64</height>
+        <width>64</width>
+        <right>20</right>
+        <left />
+        <top>170</top>
+        <bottom />
+        <control type="button" id="123">
+          <height />
+          <width />
+          <right>0</right>
+          <left>0</left>
+          <top>0</top>
+          <bottom>0</bottom>
+          <aligny>center</aligny>
+          <align>center</align>
+          <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+          <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+          <colordiffuse />
+          <onleft>103</onleft>
+          <onright>103</onright>
+          <onup>122</onup>
+          <ondown>131</ondown>
+        </control>
+        <control type="image">
+          <height>52</height>
+          <width>52</width>
+          <top>6</top>
+          <left>6</left>
+          <right />
+          <bottom />
+          <aligny>center</aligny>
+          <align>center</align>
+          <texture colordiffuse="B3FFFFFF">icons/list.32.png</texture>
+        </control>
+      </control>
+        <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.originalname),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>175</top>
+        <left>-15</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+        <control type="edit" id="104">
+          <top>240</top>
+          <left>0</left>
+          <right>55%</right>
+          <height>80</height>
+          <align>left</align>
+          <width />
+          <aligny>center</aligny>
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label>$ADDON[plugin.video.fanfilm 30261]</label>
+          <hinttext>Year</hinttext>
+          <onup>103</onup>
+          <ondown>105</ondown>
+          <textoffsetx>25</textoffsetx>
+          <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+          <texturenofocus />
+        </control>
+        <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.year),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>255</top>
+        <left>-15</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+        <control type="edit" id="105">
+          <top>240</top>
+          <left>55%</left>
+          <right>0</right>
+          <height>80</height>
+          <align>left</align>
+          <width />
+          <aligny>center</aligny>
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label>$ADDON[plugin.video.fanfilm 30262]</label>
+          <hinttext>Enter date</hinttext>
+          <onup>104</onup>
+          <ondown>106</ondown>
+          <textoffsetx>25</textoffsetx>
+          <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+          <texturenofocus />
+        </control>
+        <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.premiered),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>255</top>
+        <left>54%</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+        <control type="edit" id="106">
+          <top>320</top>
+          <left>0</left>
+          <right>55%</right>
+          <height>80</height>
+          <align>left</align>
+          <width />
+          <aligny>center</aligny>
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label>IMDB:</label>
+          <hinttext>ID</hinttext>
+          <onup>105</onup>
+          <ondown>107</ondown>
+          <textoffsetx>25</textoffsetx>
+          <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+          <texturenofocus />
+        </control>
+        <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.imdb),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>335</top>
+        <left>-15</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+        <control type="edit" id="107">
+          <top>320</top>
+          <left>55%</left>
+          <right>0</right>
+          <height>80</height>
+          <align>left</align>
+          <width />
+          <aligny>center</aligny>
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label>TMDB:</label>
+          <hinttext>ID</hinttext>
+          <onup>106</onup>
+          <ondown>109</ondown>
+          <description>ABC</description>
+          <textoffsetx>25</textoffsetx>
+          <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+          <texturenofocus />
+        </control>
+        <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.tmdb),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>335</top>
+        <left>54%</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+        <control type="group" id="92">
+          <top>400</top>
+          <visible>String.IsEqual(Window.Property(search.media_type),episode)</visible>
+
+          <control type="edit" id="109">
+            <left>0%</left>
+            <right>55%</right>
+            <height>80</height>
+            <align>left</align>
+            <width />
+            <aligny>center</aligny>
+            <textcolor>B3FFFFFF</textcolor>
+            <focusedcolor>ffffffff</focusedcolor>
+            <font ff:style="normal">font13</font>
+            <label>$ADDON[plugin.video.fanfilm 30264]</label>
+            <hinttext>Number</hinttext>
+            <onup>107</onup>
+            <ondown>110</ondown>
+            <textoffsetx>25</textoffsetx>
+            <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+            <texturenofocus />
+          </control>
+          <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.season),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>15</top>
+        <left>-15</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+          <control type="edit" id="110">
+            <left>55%</left>
+            <right>0</right>
+            <height>80</height>
+            <align>left</align>
+            <width />
+            <aligny>center</aligny>
+            <textcolor>B3FFFFFF</textcolor>
+            <focusedcolor>ffffffff</focusedcolor>
+            <font ff:style="normal">font13</font>
+            <label>$ADDON[plugin.video.fanfilm 30265]</label>
+            <hinttext>Number</hinttext>
+            <onup>109</onup>
+            <ondown>131</ondown>  
+            <textoffsetx>25</textoffsetx>
+            <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+            <texturenofocus />
+          </control>
+          <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.episode),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>15</top>
+        <left>54%</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+          <control type="edit" id="111">
+            <enable>false</enable>
+            <top>80</top>
+            <right>90</right>
+            <height>70</height>
+            <align>left</align>
+            <width />
+            <aligny>center</aligny>
+            <textcolor>B3FFFFFF</textcolor>
+            <disabledcolor>B3FFFFFF</disabledcolor>
+            <focusedcolor>ffffffff</focusedcolor>
+            <font ff:style="normal">font13</font>
+            <label>$ADDON[plugin.video.fanfilm 30541]</label>
+            <onup>110</onup>
+            <ondown>31</ondown>
+            <onleft>131</onleft>
+            <onright>131</onright>
+            <textoffsetx>25</textoffsetx>
+            <texturefocus border="10" colordiffuse="FF1A232A">white.png</texturefocus>
+            <texturenofocus />
+          </control>
+          <control type="group">
+        <height>64</height>
+        <width>64</width>
+        <right>20</right>
+        <left />
+        <top>85</top>
+        <bottom />
+        <control type="button" id="131">
+          <height />
+          <width />
+          <right>0</right>
+          <left>0</left>
+          <top>0</top>
+          <bottom>0</bottom>
+          <aligny>center</aligny>
+          <align>center</align>
+          <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+          <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+          <colordiffuse />
+          <onleft>131</onleft>
+          <onright>131</onright>
+          <onup>110</onup>
+          <ondown>31</ondown>
+        </control>
+        <control type="image">
+          <height>52</height>
+          <width>52</width>
+          <top>6</top>
+          <left>6</left>
+          <right />
+          <bottom />
+          <aligny>center</aligny>
+          <align>center</align>
+          <texture colordiffuse="B3FFFFFF">icons/list.32.png</texture>
+        </control>
+      </control>
+          <control type="image">
+        <visible>String.IsEqual(Window.Property(search.modified.episode_group),true)</visible>
+        <height>32</height>
+        <width>32</width>
+        <top>95</top>
+        <left>-15</left>
+        <right />
+        <bottom />
+        <aligny>center</aligny>
+        <align>center</align>
+        <texture colordiffuse="B3FFFF99">icons/modified.32.png</texture>
+      </control>
+          </control>
+
+      </control>
+
+      <control type="group" id="30">
+        <bottom>30</bottom>
+        <centerleft>50%</centerleft>
+        <left />
+        <top />
+        <width>1300</width>
+        <height>70</height>
+
+        <control type="button" id="31">
+          <width>250</width>
+          <left>780</left>
+          <top />
+          <align>center</align>
+          <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+          <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+          <colordiffuse />
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label>$ADDON[plugin.video.fanfilm 30266]</label>
+          <textwidth>230</textwidth>
+          <onright>32</onright>
+          <onleft>33</onleft>
+          <onup>131</onup>
+          <ondown>101</ondown>
+        </control>
+        <control type="button" id="32">
+          <width>250</width>
+          <left>1050</left>
+          <top />
+          <align>center</align>
+          <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+          <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+          <colordiffuse />
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label text="Cancel">$LOCALIZE[222]</label>
+          <textwidth>230</textwidth>
+          <onleft>31</onleft>
+          <onup>131</onup>
+          <ondown>101</ondown>
+        </control>
+        <control type="button" id="33">
+          <width>250</width>
+          <left>0</left>
+          <top />
+          <align>center</align>
+          <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+          <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+          <colordiffuse />
+          <textcolor>B3FFFFFF</textcolor>
+          <focusedcolor>ffffffff</focusedcolor>
+          <font ff:style="normal">font13</font>
+          <label text="Defaults">$LOCALIZE[409]</label>
+          <textwidth>230</textwidth>
+          <onright>31</onright>
+          <onup>131</onup>
+          <ondown>101</ondown>
+        </control>
+
+      </control>
+    </control>
+  </controls>
+</window>

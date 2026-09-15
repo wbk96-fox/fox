@@ -1,0 +1,8 @@
+<resources>
+
+    <style name="Theme.FoxTv" parent="Theme.AppCompat.DayNight.NoActionBar" />
+
+    <style name="Theme.FoxTv.Launcher" parent="Theme.FoxTv">
+        <item name="android:windowBackground">@drawable/splash_screen_background</item>
+    </style>
+</resources>

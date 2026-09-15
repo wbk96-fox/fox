@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<!-- AniNeko embed fixture with a RELATIVE HLS manifest reference: it must be resolved
+     against the final embed URL after redirects, never against the base URL. Track
+     sources exercise relative, scheme-relative and entity-encoded absolute URLs. -->
+<html>
+<head><title>Player</title></head>
+<body>
+<div id="player"></div>
+<script>const src = '../hls/relative-master.m3u8?v=1';</script>
+<track src="subs/pl.vtt" label="Polski" srclang="pl" default>
+<track src="subs/pl.vtt" label="Polski duplikat" srclang="pl">
+<track src="subs/en.vtt" label="English" srclang="en">
+<track src="//__HOST__/subs/scheme-relative.vtt" label="Scheme relative" srclang="en">
+</body>
+</html>

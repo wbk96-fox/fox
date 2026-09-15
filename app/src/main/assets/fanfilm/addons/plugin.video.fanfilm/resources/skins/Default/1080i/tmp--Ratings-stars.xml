@@ -1,0 +1,789 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window xmlns:ff="ff" type="dialog" modality="modal">
+
+  <ff:defines>
+    <macro name="rating_button">
+      <param name="n" />
+      <param name="N" value="10" />
+      <param name="id" value="{40 + n}" />
+      <param name="left" value="{80 * (n - 1) + (1100 - 70 * (N - 1) - 10 * (N - 2)) / 2}" />
+      <param name="onright" value="{40 + n + 1}" />
+      <param name="onleft" value="{40 + n - 1}" />
+      <param name="ondown" value="51" />
+      <control type="button" id="{id}">
+        <centerleft>{left} </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​{n}</label>  
+        <onright>{onright}</onright>
+        <onleft>{onleft}</onleft>
+        <ondown>{ondown}</ondown>
+      </control>
+    </macro>
+
+    <macro name="rating_button_box">
+      <control type="group">
+        <height>85</height>
+        <control type="button" id="41">
+        <centerleft>195.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​1</label>  
+        <onright>42</onright>
+        <onleft>50</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="42">
+        <centerleft>275.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​2</label>  
+        <onright>43</onright>
+        <onleft>41</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="43">
+        <centerleft>355.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​3</label>  
+        <onright>44</onright>
+        <onleft>42</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="44">
+        <centerleft>435.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​4</label>  
+        <onright>45</onright>
+        <onleft>43</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="45">
+        <centerleft>515.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​5</label>  
+        <onright>46</onright>
+        <onleft>44</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="46">
+        <centerleft>595.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​6</label>  
+        <onright>47</onright>
+        <onleft>45</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="47">
+        <centerleft>675.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​7</label>  
+        <onright>48</onright>
+        <onleft>46</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="48">
+        <centerleft>755.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​8</label>  
+        <onright>49</onright>
+        <onleft>47</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="49">
+        <centerleft>835.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​9</label>  
+        <onright>50</onright>
+        <onleft>48</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="50">
+        <centerleft>915.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​10</label>  
+        <onright>41</onright>
+        <onleft>49</onleft>
+        <ondown>51</ondown>
+      </control>
+        </control>
+    </macro>
+
+    <macro name="button">
+      <param name="id" />
+      <param name="label" />
+      <control type="button" id="{id}">
+        <width>250</width>
+        <height>55</height>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <align>center</align>
+        <aligny>center</aligny>
+        <font ff:style="normal">font13</font>
+        <textwidth>230</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <label>{label}</label>
+        <onup>45</onup>
+      </control>
+    </macro>
+
+  </ff:defines>
+
+  <coordinates>
+    <top>0</top>
+    <left>0</left>
+    <width>1920</width>
+    <height>1080</height>
+  </coordinates>
+
+  <controls>
+    <control type="image">
+      <top />
+      <left />
+      <width>1920</width>
+      <height>1080</height>
+      <texture border="10" colordiffuse="BF000000">white.png</texture>
+    </control>
+
+    <control type="group">
+      <centertop>50%</centertop>
+      <centerleft>50%</centerleft>
+      <top />
+      <bottom />
+      <left />
+      <right />
+      <width>1100</width>
+      <height>385</height>
+
+      <control type="image">
+        <colordiffuse>D9202E39</colordiffuse>
+        <texture border="20">dialogs/rounded.png</texture>
+      </control>
+
+      <control type="image">
+        <colordiffuse>D9141519</colordiffuse>
+        <texture border="20">dialogs/rounded.png</texture>
+        <bordersize>4</bordersize>
+      </control>
+
+      <control type="group">
+        <centertop>50%</centertop>
+        <centerleft>50%</centerleft>
+        <top />
+        <bottom />
+        <left />
+        <right />
+
+        <control type="group">
+          <height>110</height>
+
+          <control type="label" id="10">
+            <left>30</left>
+            <right>30</right>
+            <top>10</top>
+            <height>40</height>
+            <align>center</align>
+            <textcolor>BFFFFFFF</textcolor>
+            <font ff:style="heading">font_title_small</font>
+            <label>$INFO[Window.Property(title)]</label>
+          </control>
+
+          <control type="label">
+            <left>30</left>
+            <right>30</right>
+            <top>55</top>
+            <height>35</height>
+            <align>center</align>
+            <textcolor>B3FFFFFF</textcolor>
+            <font ff:style="normal">font13</font>
+            <label>$INFO[Window.Property(media.title)]</label>
+          </control>
+
+          <control type="image">
+            <colordiffuse>D9202E39</colordiffuse>
+            <texture>white.png</texture>
+            <top>100</top>
+            <height>2</height>
+            <left>25</left>
+            <right>25</right>
+            <width />
+            <centerleft>50%</centerleft>
+          </control>
+
+        </control>
+
+        <control type="grouplist">
+          <orientation>vertical</orientation>
+          <centerleft>50%</centerleft>
+          <top>120</top>
+          <bottom>80</bottom>
+          <left />
+          <right />
+
+
+            <control type="group">
+              <height>45</height>
+
+              <control type="label">
+                <height>45</height>
+                <left>30</left>
+                <right>30</right>
+                <align>left</align>
+                <textcolor>B3FFFFFF</textcolor>
+                <font ff:style="normal">font13</font>
+                <label>IMDB</label>
+              </control>
+
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>190.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>270.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>350.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>430.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>510.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>590.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>670.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>750.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>830.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+                <control type="image">
+                  <left />
+                  <top />
+                  <centerleft>910.0</centerleft>
+                  <centertop>50%</centertop>
+                  <width>24</width>
+                  <height>24</height>
+                  <texture>icons/star-empty.32.png</texture>
+                  <colordiffuse>FF11BAC0</colordiffuse>
+                </control>
+
+
+            </control>
+
+          <control type="group">
+            <height>15</height>
+          </control>
+          <control type="group">
+        <height>85</height>
+        <control type="button" id="41">
+        <centerleft>195.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​1</label>  
+        <onright>42</onright>
+        <onleft>50</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="42">
+        <centerleft>275.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​2</label>  
+        <onright>43</onright>
+        <onleft>41</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="43">
+        <centerleft>355.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​3</label>  
+        <onright>44</onright>
+        <onleft>42</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="44">
+        <centerleft>435.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​4</label>  
+        <onright>45</onright>
+        <onleft>43</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="45">
+        <centerleft>515.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​5</label>  
+        <onright>46</onright>
+        <onleft>44</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="46">
+        <centerleft>595.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​6</label>  
+        <onright>47</onright>
+        <onleft>45</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="47">
+        <centerleft>675.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​7</label>  
+        <onright>48</onright>
+        <onleft>46</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="48">
+        <centerleft>755.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​8</label>  
+        <onright>49</onright>
+        <onleft>47</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="49">
+        <centerleft>835.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​9</label>  
+        <onright>50</onright>
+        <onleft>48</onleft>
+        <ondown>51</ondown>
+      </control>
+        <control type="button" id="50">
+        <centerleft>915.0 </centerleft>
+        <centertop>50%</centertop>
+        <left />
+        <right />
+        <top />
+        <bottom />
+        <width>70</width>
+        <height>60</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <textwidth>60</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <font ff:style="normal">font13</font>
+        <label>​10</label>  
+        <onright>41</onright>
+        <onleft>49</onleft>
+        <ondown>51</ondown>
+      </control>
+        </control>
+          </control>
+
+        <control type="grouplist">
+          <centerleft>50%</centerleft>
+          <left />
+          <top />
+          <bottom>20</bottom>
+          <width>520</width>
+          <height>60</height>
+          <orientation>horizontal</orientation>
+          <itemgap>20</itemgap>
+          <align>center</align>
+
+          <control type="button" id="52">
+        <width>250</width>
+        <height>55</height>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <align>center</align>
+        <aligny>center</aligny>
+        <font ff:style="normal">font13</font>
+        <textwidth>230</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <label>Usuń ocenę</label>
+        <onup>45</onup>
+      </control>
+          <control type="button" id="51">
+        <width>250</width>
+        <height>55</height>
+        <texturenofocus border="6">dialogs/button-nofocus.png</texturenofocus>
+        <texturefocus border="6">dialogs/button-focus.png</texturefocus>
+        <colordiffuse />
+        <align>center</align>
+        <aligny>center</aligny>
+        <font ff:style="normal">font13</font>
+        <textwidth>230</textwidth>
+        <textcolor>B3FFFFFF</textcolor>
+        <focusedcolor>ffffffff</focusedcolor>
+        <label>$LOCALIZE[222]</label>
+        <onup>45</onup>
+      </control>
+          </control>
+
+      </control>
+    </control>
+  </controls>
+</window>

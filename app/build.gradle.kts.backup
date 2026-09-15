@@ -1,0 +1,802 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.androidx.baselineprofile)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.sentry.android.gradle)
+    alias(libs.plugins.chaquopy)
+}
+
+import java.io.File
+import java.util.Properties
+import org.gradle.api.tasks.testing.Test
+
+fun parseBooleanProperty(value: String?): Boolean {
+    val normalized = value?.trim()?.lowercase() ?: return false
+    return normalized == "1" || normalized == "true" || normalized == "yes" || normalized == "on"
+}
+
+fun parseRequiredBooleanProperty(name: String, value: String): Boolean {
+    return when (value.trim().lowercase()) {
+        "true" -> true
+        "false" -> false
+        else -> throw GradleException(
+            "$name must be explicitly set to canonical true or false when DOVI_NATIVE_ENABLED=true."
+        )
+    }
+}
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(localPropertiesFile.inputStream())
+    }
+}
+
+val devProperties = Properties().apply {
+    val devPropertiesFile = rootProject.file("local.dev.properties")
+    if (devPropertiesFile.exists()) {
+        load(devPropertiesFile.inputStream())
+    }
+}
+
+val envProperties = Properties().apply {
+    val envFile = rootProject.file(".env")
+    if (envFile.exists()) {
+        envFile.bufferedReader().useLines { lines ->
+            lines.map { it.trim() }
+                .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains("=") }
+                .forEach { line ->
+                    val index = line.indexOf('=')
+                    val key = line.substring(0, index).trim()
+                    var value = line.substring(index + 1).trim()
+                    if ((value.startsWith("\"") && value.endsWith("\"")) ||
+                        (value.startsWith("'") && value.endsWith("'"))) {
+                        value = value.substring(1, value.length - 1)
+                    }
+                    setProperty(key, value)
+                }
+        }
+    }
+}
+
+// Merge env properties into localProperties as fallback so any direct read also picks them up
+envProperties.forEach { key, value ->
+    if (!localProperties.containsKey(key)) {
+        localProperties[key] = value
+    }
+}
+
+fun resolveProperty(dev: Properties, local: Properties, key: String, fallback: String = ""): String {
+    return dev.getProperty(key)?.trim()?.takeIf { it.isNotBlank() }
+        ?: local.getProperty(key)?.trim()?.takeIf { it.isNotBlank() }
+        ?: envProperties.getProperty(key)?.trim()?.takeIf { it.isNotBlank() }
+        ?: providers.environmentVariable(key).orNull?.trim()?.takeIf { it.isNotBlank() }
+        ?: fallback
+}
+
+fun buildConfigString(value: String): String {
+    return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+}
+
+fun cmakePath(path: String): String {
+    if (path.isBlank()) return ""
+    val file = File(path)
+    val resolved = if (file.isAbsolute) file else rootProject.file(path)
+    return resolved.absolutePath.replace("\\", "/")
+}
+
+val enableDoviNative = parseBooleanProperty(
+    resolveProperty(devProperties, localProperties, "DOVI_NATIVE_ENABLED")
+)
+val doviExtractorHookReady = parseBooleanProperty(
+    resolveProperty(devProperties, localProperties, "DOVI_EXTRACTOR_HOOK_READY")
+)
+val doviEnableRealLink = if (enableDoviNative) {
+    parseRequiredBooleanProperty(
+        "DOVI_ENABLE_REAL_LINK",
+        resolveProperty(devProperties, localProperties, "DOVI_ENABLE_REAL_LINK")
+    )
+} else {
+    false
+}
+val doviStaticLibPath = resolveProperty(devProperties, localProperties, "DOVI_LIBDOVI_STATIC_LIB")
+val doviIncludeDirPath = resolveProperty(devProperties, localProperties, "DOVI_LIBDOVI_INCLUDE_DIR")
+val doviPrebuiltRootPath = resolveProperty(devProperties, localProperties, "DOVI_LIBDOVI_PREBUILT_ROOT")
+val sponsorNames = resolveProperty(devProperties, localProperties, "SPONSOR_NAMES", "ragmehos.")
+val sentryDsn = providers.environmentVariable("SENTRY_DSN").orNull?.trim()?.takeIf { it.isNotBlank() }
+    ?: resolveProperty(devProperties, localProperties, "SENTRY_DSN")
+val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").orNull?.trim()?.takeIf { it.isNotBlank() }
+    ?: resolveProperty(devProperties, localProperties, "SENTRY_AUTH_TOKEN").takeIf { it.isNotBlank() }
+val sentryOrg = providers.environmentVariable("SENTRY_ORG").orNull?.trim()?.takeIf { it.isNotBlank() }
+    ?: resolveProperty(devProperties, localProperties, "SENTRY_ORG").takeIf { it.isNotBlank() }
+val sentryProject = providers.environmentVariable("SENTRY_PROJECT").orNull?.trim()?.takeIf { it.isNotBlank() }
+    ?: resolveProperty(devProperties, localProperties, "SENTRY_PROJECT").takeIf { it.isNotBlank() }
+val sentryMappingUploadEnabled = sentryAuthToken != null && sentryOrg != null && sentryProject != null
+
+fun env(name: String): String? = providers.environmentVariable(name).orNull
+
+val buildingAppBundle = gradle.startParameter.taskNames.any { it.contains("bundle", ignoreCase = true) }
+val useDebugReleaseSigning = env("CI_USE_DEBUG_SIGNING").equals("true", ignoreCase = true)
+val useLocalFfmpegDecoder =
+    gradle.extensions.extraProperties.get("foxtvUseLocalFfmpegDecoder") as Boolean
+/**
+ * Host interpreter used by Chaquopy to byte-compile sources and resolve wheels.
+ * It must be CPython 3.11 to match the interpreter packaged into the APK.
+ *
+ * Resolution order: FOXTV_BUILD_PYTHON (local.properties / env) → python3.11 on
+ * PATH → python3 on PATH. Each candidate is probed for a 3.11 version string so a
+ * mismatched default python3 does not silently produce bytecode the device cannot
+ * load. If nothing matches we hand Chaquopy "python3.11" so the failure names the
+ * missing tool instead of surfacing as a magic-number error at runtime.
+ */
+val buildPythonCommand: List<String> = run {
+    fun probe(command: String): Boolean = runCatching {
+        val process = ProcessBuilder(command, "--version")
+            .redirectErrorStream(true)
+            .start()
+        val output = process.inputStream.bufferedReader().readText().trim()
+        process.waitFor()
+        process.exitValue() == 0 && output.contains("3.11")
+    }.getOrDefault(false)
+
+    val candidates = buildList {
+        resolveProperty(devProperties, localProperties, "FOXTV_BUILD_PYTHON")
+            .takeIf { it.isNotBlank() }
+            ?.let { add(it) }
+        add("python3.11")
+        add("python3")
+    }
+    listOf(candidates.firstOrNull(::probe) ?: "python3.11")
+}
+
+val releaseStoreFilePath = env("FOXTV_RELEASE_STORE_FILE")
+    ?: localProperties.getProperty("FOXTV_RELEASE_STORE_FILE")
+val releaseKeyAliasValue = env("FOXTV_RELEASE_KEY_ALIAS")
+    ?: localProperties.getProperty("FOXTV_RELEASE_KEY_ALIAS", "foxtv")
+val releaseKeyPasswordValue = env("FOXTV_RELEASE_KEY_PASSWORD")
+    ?: localProperties.getProperty("FOXTV_RELEASE_KEY_PASSWORD", "815787")
+val releaseStorePasswordValue = env("FOXTV_RELEASE_STORE_PASSWORD")
+    ?: localProperties.getProperty("FOXTV_RELEASE_STORE_PASSWORD", "815787")
+
+android {
+    namespace = "com.foxtv.app"
+    compileSdk = 36
+    ndkVersion = "28.2.13676358"
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
+    defaultConfig {
+        applicationId = "com.foxtv.app"
+        minSdk = 24
+        targetSdk = 36
+        versionCode = 1055
+        versionName = "1.1.1"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "PARENTAL_GUIDE_API_URL", buildConfigString(resolveProperty(devProperties, localProperties, "PARENTAL_GUIDE_API_URL", "")))
+        buildConfigField("String", "INTRODB_API_URL", buildConfigString(resolveProperty(devProperties, localProperties, "INTRODB_API_URL", "")))
+        buildConfigField("String", "TRAILER_API_URL", buildConfigString(resolveProperty(devProperties, localProperties, "TRAILER_API_URL", "")))
+        buildConfigField("String", "IMDB_RATINGS_API_BASE_URL", buildConfigString(resolveProperty(devProperties, localProperties, "IMDB_RATINGS_API_BASE_URL", "")))
+        buildConfigField("String", "IMDB_TAPFRAME_API_BASE_URL", buildConfigString(resolveProperty(devProperties, localProperties, "IMDB_TAPFRAME_API_BASE_URL", "")))
+        buildConfigField("String", "TRAKT_CLIENT_ID", buildConfigString(resolveProperty(devProperties, localProperties, "TRAKT_CLIENT_ID", "")))
+        buildConfigField("String", "TRAKT_CLIENT_SECRET", buildConfigString(resolveProperty(devProperties, localProperties, "TRAKT_CLIENT_SECRET", "")))
+        buildConfigField("String", "TRAKT_API_URL", buildConfigString(resolveProperty(devProperties, localProperties, "TRAKT_API_URL", "https://api.trakt.tv/")))
+        buildConfigField("String", "TRAKT_REDIRECT_URI", buildConfigString(resolveProperty(devProperties, localProperties, "TRAKT_REDIRECT_URI", "urn:ietf:wg:oauth:2.0:oob")))
+        buildConfigField("String", "SIMKL_CLIENT_ID", buildConfigString(resolveProperty(devProperties, localProperties, "SIMKL_CLIENT_ID", "")))
+        buildConfigField("String", "SIMKL_CLIENT_SECRET", buildConfigString(resolveProperty(devProperties, localProperties, "SIMKL_CLIENT_SECRET", "")))
+        // SIMKL_APP_NAME must match the app name registered against SIMKL_CLIENT_ID on
+        // simkl.com; it is an external identifier, not a branding string. Configure it in
+        // local.properties together with the client id/secret.
+        buildConfigField("String", "SIMKL_APP_NAME", buildConfigString(resolveProperty(devProperties, localProperties, "SIMKL_APP_NAME", "")))
+        buildConfigField("String", "TMDB_API_KEY", buildConfigString(resolveProperty(devProperties, localProperties, "TMDB_API_KEY", "")))
+        buildConfigField("String", "TV_LOGIN_WEB_BASE_URL", buildConfigString(resolveProperty(devProperties, localProperties, "TV_LOGIN_WEB_BASE_URL", "")))
+        buildConfigField("String", "DEVICE_LOGIN_WEB_BASE_URL", buildConfigString(resolveProperty(devProperties, localProperties, "DEVICE_LOGIN_WEB_BASE_URL", "")))
+        buildConfigField("boolean", "DOVI_NATIVE_ENABLED", enableDoviNative.toString())
+        buildConfigField("boolean", "DOVI_EXTRACTOR_HOOK_READY", doviExtractorHookReady.toString())
+        if (enableDoviNative) {
+            externalNativeBuild {
+                cmake {
+                    arguments(
+                        "-DDOVI_ENABLE_LIBDOVI=${if (doviEnableRealLink) "ON" else "OFF"}",
+                        "-DDOVI_LIBDOVI_STATIC_LIB=${cmakePath(doviStaticLibPath)}",
+                        "-DDOVI_LIBDOVI_INCLUDE_DIR=${cmakePath(doviIncludeDirPath)}",
+                        "-DDOVI_LIBDOVI_PREBUILT_ROOT=${cmakePath(doviPrebuiltRootPath)}"
+                    )
+                }
+            }
+        }
+        buildConfigField("String", "SUPPORTERS_API_BASE_URL", buildConfigString(localProperties.getProperty("SUPPORTERS_API_BASE_URL", "")))
+        buildConfigField("String", "SUPPORT_URL", buildConfigString(localProperties.getProperty("SUPPORT_URL", "")))
+        buildConfigField("String", "AVATAR_PUBLIC_BASE_URL", "\"${localProperties.getProperty("AVATAR_PUBLIC_BASE_URL", "")}\"")
+        buildConfigField("String", "UNIQUE_CONTRIBUTIONS_BASE_URL", "\"${localProperties.getProperty("UNIQUE_CONTRIBUTIONS_BASE_URL", "")}\"")
+        buildConfigField("String", "PLAYBACK_REPORTS_BASE_URL", buildConfigString(localProperties.getProperty("PLAYBACK_REPORTS_BASE_URL", "")))
+        buildConfigField("String", "PREMIUMIZE_CLIENT_ID", "\"${localProperties.getProperty("PREMIUMIZE_CLIENT_ID", "")}\"")
+        buildConfigField("String", "SPONSOR_NAMES", buildConfigString(sponsorNames))
+        buildConfigField("String", "SENTRY_DSN", buildConfigString(sentryDsn))
+
+        // Legal pages are served by whoever operates the configured account backend, so
+        // they are supplied privately. Blank values hide the corresponding rows instead of
+        // opening a dead link (see AboutScreen / AuthQrSignInScreen).
+        buildConfigField("String", "LEGAL_PRIVACY_URL", buildConfigString(resolveProperty(devProperties, localProperties, "LEGAL_PRIVACY_URL", "")))
+        buildConfigField("String", "LEGAL_TERMS_URL", buildConfigString(resolveProperty(devProperties, localProperties, "LEGAL_TERMS_URL", "")))
+
+        // In-app updater (GitHub Releases). FOX.TV ships from a private repository, so the
+        // coordinates come from local.properties / CI env. Blank values disable the updater
+        // (UpdateRepository.isConfigured) rather than pointing it at a foreign application.
+        buildConfigField("String", "GITHUB_OWNER", buildConfigString(resolveProperty(devProperties, localProperties, "FOXTV_UPDATE_GITHUB_OWNER", "")))
+        buildConfigField("String", "GITHUB_REPO", buildConfigString(resolveProperty(devProperties, localProperties, "FOXTV_UPDATE_GITHUB_REPO", "")))
+
+        // FOX.TV is a single full distribution (AGENTS.md §11): every capability that used
+        // to be gated behind the "full" flavor is unconditionally on.
+        buildConfigField("boolean", "FEATURE_PLUGINS_ENABLED", "true")
+        buildConfigField("boolean", "FEATURE_IN_APP_UPDATES_ENABLED", "true")
+        buildConfigField("boolean", "FEATURE_IN_APP_TRAILERS_ENABLED", "true")
+        buildConfigField("boolean", "FEATURE_EXTERNAL_TRAILERS_ENABLED", "true")
+        buildConfigField("boolean", "FEATURE_EXTERNAL_PLAYBACK_KEEP_ALIVE_ENABLED", "true")
+        buildConfigField("boolean", "FEATURE_CUSTOM_SERVER_CONNECTIONS_ENABLED", "true")
+
+        ndk {
+            // Chaquopy requires explicit ABI filters; Python 3.11 is the last interpreter
+            // that ships armeabi-v7a/x86 binaries, which is why FOX.TV pins 3.11 below.
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        }
+    }
+
+    if (enableDoviNative) {
+        externalNativeBuild {
+            cmake {
+                path = file("src/main/cpp/CMakeLists.txt")
+            }
+        }
+    }
+
+    val releaseKeystoreFile = releaseStoreFilePath?.let(::file) ?: file("../foxtv.jks")
+    val hasReleaseKeystore = releaseKeystoreFile.exists()
+
+    signingConfigs {
+        create("release") {
+            if (hasReleaseKeystore) {
+                keyAlias = releaseKeyAliasValue
+                keyPassword = releaseKeyPasswordValue
+                storeFile = releaseKeystoreFile
+                storePassword = releaseStorePasswordValue
+            } else {
+                val debugConfig = getByName("debug")
+                keyAlias = debugConfig.keyAlias
+                keyPassword = debugConfig.keyPassword
+                storeFile = debugConfig.storeFile
+                storePassword = debugConfig.storePassword
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = true
+            isMinifyEnabled = false
+
+            buildConfigField("boolean", "IS_DEBUG_BUILD", "true")
+            buildConfigField("String", "SENTRY_ENVIRONMENT", buildConfigString("debug"))
+
+            // Dev environment (from local.dev.properties)
+            buildConfigField("String", "SUPABASE_URL", buildConfigString(resolveProperty(devProperties, localProperties, "FOXTV_SUPABASE_URL")))
+            buildConfigField("String", "SUPABASE_ANON_KEY", buildConfigString(resolveProperty(devProperties, localProperties, "FOXTV_SUPABASE_ANON_KEY")))
+            buildConfigField("String", "SUPABASE_FALLBACK_URL", buildConfigString(resolveProperty(devProperties, localProperties, "FOXTV_SUPABASE_FALLBACK_URL")))
+            buildConfigField("String", "TV_LOGIN_WEB_BASE_URL", "\"${devProperties.getProperty("TV_LOGIN_WEB_BASE_URL", "")}\"")
+            buildConfigField("String", "DEVICE_LOGIN_WEB_BASE_URL", "\"${devProperties.getProperty("DEVICE_LOGIN_WEB_BASE_URL", "")}\"")
+            buildConfigField("String", "PARENTAL_GUIDE_API_URL", "\"${devProperties.getProperty("PARENTAL_GUIDE_API_URL", "")}\"")
+            buildConfigField("String", "INTRODB_API_URL", "\"${devProperties.getProperty("INTRODB_API_URL", "")}\"")
+            buildConfigField("String", "TRAILER_API_URL", "\"${devProperties.getProperty("TRAILER_API_URL", "")}\"")
+            buildConfigField("String", "IMDB_RATINGS_API_BASE_URL", "\"${devProperties.getProperty("IMDB_RATINGS_API_BASE_URL", "")}\"")
+            buildConfigField("String", "IMDB_TAPFRAME_API_BASE_URL", "\"${devProperties.getProperty("IMDB_TAPFRAME_API_BASE_URL", "")}\"")
+            buildConfigField("String", "SUPPORTERS_API_BASE_URL", buildConfigString(resolveProperty(devProperties, localProperties, "SUPPORTERS_API_BASE_URL", "")))
+            buildConfigField("String", "SUPPORT_URL", buildConfigString(resolveProperty(devProperties, localProperties, "SUPPORT_URL", "")))
+            buildConfigField("String", "AVATAR_PUBLIC_BASE_URL", "\"${devProperties.getProperty("AVATAR_PUBLIC_BASE_URL", localProperties.getProperty("AVATAR_PUBLIC_BASE_URL", ""))}\"")
+            buildConfigField("String", "UNIQUE_CONTRIBUTIONS_BASE_URL", "\"${devProperties.getProperty("UNIQUE_CONTRIBUTIONS_BASE_URL", localProperties.getProperty("UNIQUE_CONTRIBUTIONS_BASE_URL", ""))}\"")
+            buildConfigField("String", "PLAYBACK_REPORTS_BASE_URL", buildConfigString(resolveProperty(devProperties, localProperties, "PLAYBACK_REPORTS_BASE_URL")))
+            buildConfigField("String", "PREMIUMIZE_CLIENT_ID", "\"${devProperties.getProperty("PREMIUMIZE_CLIENT_ID", localProperties.getProperty("PREMIUMIZE_CLIENT_ID", ""))}\"")
+            buildConfigField("String", "SPONSOR_NAMES", buildConfigString(sponsorNames))
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = if (useDebugReleaseSigning) {
+                signingConfigs.getByName("debug")
+            } else {
+                signingConfigs.getByName("release")
+            }
+
+            buildConfigField("boolean", "IS_DEBUG_BUILD", "false")
+            buildConfigField("String", "SENTRY_ENVIRONMENT", buildConfigString("production"))
+
+            // Production environment (from local.properties)
+            buildConfigField("String", "SUPABASE_URL", buildConfigString(localProperties.getProperty("FOXTV_SUPABASE_URL", "")))
+            buildConfigField("String", "SUPABASE_ANON_KEY", buildConfigString(localProperties.getProperty("FOXTV_SUPABASE_ANON_KEY", "")))
+            buildConfigField("String", "SUPABASE_FALLBACK_URL", buildConfigString(localProperties.getProperty("FOXTV_SUPABASE_FALLBACK_URL", "")))
+            buildConfigField("String", "TV_LOGIN_WEB_BASE_URL", "\"${localProperties.getProperty("TV_LOGIN_WEB_BASE_URL", "")}\"")
+            buildConfigField("String", "DEVICE_LOGIN_WEB_BASE_URL", "\"${localProperties.getProperty("DEVICE_LOGIN_WEB_BASE_URL", "")}\"")
+            buildConfigField("String", "PARENTAL_GUIDE_API_URL", "\"${localProperties.getProperty("PARENTAL_GUIDE_API_URL", "")}\"")
+            buildConfigField("String", "INTRODB_API_URL", "\"${localProperties.getProperty("INTRODB_API_URL", "")}\"")
+            buildConfigField("String", "TRAILER_API_URL", "\"${localProperties.getProperty("TRAILER_API_URL", "")}\"")
+            buildConfigField("String", "IMDB_RATINGS_API_BASE_URL", "\"${localProperties.getProperty("IMDB_RATINGS_API_BASE_URL", "")}\"")
+            buildConfigField("String", "IMDB_TAPFRAME_API_BASE_URL", "\"${localProperties.getProperty("IMDB_TAPFRAME_API_BASE_URL", "")}\"")
+            buildConfigField("String", "SUPPORTERS_API_BASE_URL", buildConfigString(localProperties.getProperty("SUPPORTERS_API_BASE_URL", "")))
+            buildConfigField("String", "SUPPORT_URL", buildConfigString(localProperties.getProperty("SUPPORT_URL", "")))
+            buildConfigField("String", "AVATAR_PUBLIC_BASE_URL", "\"${localProperties.getProperty("AVATAR_PUBLIC_BASE_URL", "")}\"")
+            buildConfigField("String", "UNIQUE_CONTRIBUTIONS_BASE_URL", "\"${localProperties.getProperty("UNIQUE_CONTRIBUTIONS_BASE_URL", "")}\"")
+            buildConfigField("String", "PLAYBACK_REPORTS_BASE_URL", buildConfigString(localProperties.getProperty("PLAYBACK_REPORTS_BASE_URL", "")))
+            buildConfigField("String", "PREMIUMIZE_CLIENT_ID", "\"${localProperties.getProperty("PREMIUMIZE_CLIENT_ID", "")}\"")
+            buildConfigField("String", "SPONSOR_NAMES", buildConfigString(sponsorNames))
+        }
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("boolean", "IS_DEBUG_BUILD", "true")
+            buildConfigField("String", "SENTRY_ENVIRONMENT", buildConfigString("benchmark"))
+            applicationIdSuffix = ".debug"
+            matchingFallbacks += "release"
+        }
+    }
+
+    splits {
+        abi {
+            isEnable = !buildingAppBundle
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            isUniversalApk = true
+        }
+    }
+
+    bundle {
+        language {
+            // Keep all string resources in the
+            // base install so Play Store installs can switch languages at runtime.
+            // https://developer.android.com/guide/app-bundle/configure-base
+            enableSplit = false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
+    }
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
+    }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
+    sourceSets {
+        getByName("main") {
+            jniLibs.srcDirs("src/main/jniLibs")
+        }
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+            // Keep one consistent native set across dependencies.
+            pickFirsts += listOf(
+                "lib/*/libc++_shared.so",
+                "lib/*/libavcodec.so",
+                "lib/*/libavdevice.so",
+                "lib/*/libavfilter.so",
+                "lib/*/libavformat.so",
+                "lib/*/libavutil.so",
+                "lib/*/libswscale.so",
+                "lib/*/libswresample.so",
+                "lib/*/libtorrserver.so"
+            )
+        }
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+}
+
+androidComponents {
+    // Debug builds install alongside a release install.
+    onVariants(selector().withBuildType("debug")) { variant ->
+        variant.applicationId.set("com.foxtv.app.debug")
+    }
+}
+
+composeCompiler {
+    // Enable Compose compiler metrics for performance analysis
+    metricsDestination = layout.buildDirectory.dir("compose_metrics")
+    reportsDestination = layout.buildDirectory.dir("compose_reports")
+    stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("compose_stability_config.conf"))
+}
+
+// ── FanFilm / Kodi runtime (Chaquopy) ────────────────────────────────────────
+// FanFilm is a real Kodi Python addon. It runs inside the app on a CPython
+// interpreter provided by Chaquopy; there is no REST shim (AGENTS.md §13).
+//
+// Python 3.11 is mandatory, not a preference: Chaquopy only ships armeabi-v7a
+// and x86 interpreter binaries up to 3.11, and FOX.TV keeps all four ABIs.
+chaquopy {
+    defaultConfig {
+        version = "3.11"
+
+        // Chaquopy needs a host CPython of the same minor version to compile
+        // sources and resolve wheels. Resolution order:
+        //   1. FOXTV_BUILD_PYTHON (local.properties / env) — explicit override
+        //   2. python3.11 / python3 from PATH
+        buildPython = buildPythonCommand
+
+        pip {
+            // FanFilm's addon.xml requires script.module.requests; everything else
+            // it needs is vendored inside the addon (lib/3rd) or supplied as a real
+            // Kodi addon under assets/fanfilm/addons.
+            install("requests==2.32.3")
+            install("urllib3==2.2.3")
+            install("certifi==2024.8.30")
+            install("charset-normalizer==3.4.0")
+            install("idna==3.10")
+            // six is imported by cfscrape and several ResolveURL resolvers.
+            install("six==1.16.0")
+        }
+
+    }
+}
+
+// Python sources are compiled by Chaquopy from app/src/main/python.
+// The Kodi addon tree itself lives in app/src/main/assets/fanfilm and is
+// materialised into filesDir at runtime by FanFilmAssetInstaller: Python needs
+// real files on disk (imports, sqlite, settings.xml), which assets are not.
+//
+// Running the plugin in-tree during development leaves __pycache__/*.pyc behind;
+// packaging those would ship stale bytecode, so they are pruned before merging.
+val pruneFanFilmBytecode by tasks.registering(Delete::class) {
+    val assetsRoot = layout.projectDirectory.dir("src/main/assets/fanfilm")
+    delete(
+        providers.provider {
+            if (!assetsRoot.asFile.exists()) {
+                emptyList<java.io.File>()
+            } else {
+                fileTree(assetsRoot) {
+                    include("**/__pycache__/**", "**/*.pyc", "**/*.pyo")
+                }.files
+            }
+        }
+    )
+}
+tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
+    dependsOn(pruneFanFilmBytecode)
+}
+
+// The bridge's pure-Python logic (special:// translation, playback-string normalisation,
+// and the Python↔Kotlin contract constants) is unit-tested on the host interpreter — the
+// JVM test source set cannot reach it, and a device is not required to verify it.
+val nativeAuditReportDirectory = layout.buildDirectory.dir("reports/native-audit")
+val nativeAuditJson = nativeAuditReportDirectory.map { it.file("native-audit.json") }
+val nativeAuditMarkdown = nativeAuditReportDirectory.map { it.file("native-audit.md") }
+
+val nativeArtifactAudit by tasks.registering(Exec::class) {
+    group = "verification"
+    description = "Audits pinned local native inputs, ELF policy, and native source contracts."
+    workingDir = rootProject.projectDir
+    commandLine(
+        buildPythonCommand + listOf(
+            "tools/native/audit_native_artifacts.py",
+            "--root",
+            rootProject.projectDir.absolutePath,
+            "--lock",
+            rootProject.file("tools/native/NATIVE_ARTIFACTS.lock.json").absolutePath,
+            "--report-json",
+            nativeAuditJson.get().asFile.absolutePath,
+            "--report-markdown",
+            nativeAuditMarkdown.get().asFile.absolutePath
+        )
+    )
+
+    inputs.property("pythonCommand", buildPythonCommand)
+    inputs.file(rootProject.layout.projectDirectory.file("tools/native/audit_native_artifacts.py"))
+    inputs.file(rootProject.layout.projectDirectory.file("tools/native/NATIVE_ARTIFACTS.lock.json"))
+    inputs.file(rootProject.layout.projectDirectory.file("settings.gradle.kts"))
+    inputs.file(rootProject.layout.projectDirectory.file("app/build.gradle.kts"))
+    inputs.file(rootProject.layout.projectDirectory.file("app/src/main/cpp/CMakeLists.txt"))
+    inputs.file(rootProject.layout.projectDirectory.file("app/src/main/cpp/dovi_bridge.cpp"))
+    inputs.file(
+        rootProject.layout.projectDirectory.file(
+            "app/src/main/java/com/foxtv/app/core/player/DoviBridge.kt"
+        )
+    )
+    inputs.file(
+        rootProject.layout.projectDirectory.file("ffmpeg-decoder-downmix/build.gradle.kts")
+    )
+    inputs.file(
+        rootProject.layout.projectDirectory.file(
+            "ffmpeg-decoder-downmix/src/main/jni/CMakeLists.txt"
+        )
+    )
+    inputs.file(
+        rootProject.layout.projectDirectory.file(
+            "ffmpeg-decoder-downmix/src/main/jni/build_ffmpeg.sh"
+        )
+    )
+    inputs.files(rootProject.fileTree("app/libs") { include("*.aar") })
+    inputs.files(rootProject.fileTree("app/src/main/jniLibs") { include("*/*.so") })
+    inputs.files(
+        rootProject.fileTree("DV7/libdovi") { include("android-*/lib/libdovi.a") }
+    )
+    outputs.files(nativeAuditJson, nativeAuditMarkdown)
+    // Host binutils are part of the evidence boundary but are not copied into the
+    // repository. Re-run on every invocation so a stale report cannot mask a tool drift.
+    outputs.upToDateWhen { false }
+}
+
+val foxtvPythonTest by tasks.registering(Exec::class) {
+    group = "verification"
+    description = "Runs the FanFilm Python bridge unit tests on the host interpreter."
+    workingDir = rootProject.projectDir
+    commandLine(buildPythonCommand + listOf("app/src/test/python/test_foxtv_fanfilm.py", "-v"))
+    inputs.dir(layout.projectDirectory.dir("src/main/python"))
+    inputs.dir(layout.projectDirectory.dir("src/test/python"))
+    inputs.file(
+        layout.projectDirectory.file(
+            "src/main/java/com/foxtv/app/core/fanfilm/FanFilmRuntime.kt"
+        )
+    )
+    outputs.upToDateWhen { false }
+}
+
+// Native/source integrity and the Python↔Kotlin bridge are permanent verification gates,
+// not variant preBuild hooks. CI also invokes nativeArtifactAudit explicitly because its
+// focused build workflows intentionally do not run the complete `check` lifecycle.
+tasks.named("check").configure { dependsOn(nativeArtifactAudit, foxtvPythonTest) }
+
+// Globally exclude stock media3 modules — replaced by local :foxtv-exoplayer-engine module
+configurations.all {
+    exclude(group = "androidx.media3", module = "media3-exoplayer")
+    exclude(group = "androidx.media3", module = "media3-common")
+    exclude(group = "androidx.media3", module = "media3-datasource")
+    exclude(group = "androidx.media3", module = "media3-datasource-okhttp")
+    exclude(group = "androidx.media3", module = "media3-exoplayer-hls")
+    exclude(group = "androidx.media3", module = "media3-extractor")
+}
+
+// AndroidX Baseline Profile 1.4.1 exposes this shared dependency bucket as
+// resolvable even though it has no variant attributes and is never consumed directly.
+// Keep it declarative-only: releaseBaselineProfile remains resolvable, inherits this
+// bucket, and stays covered by strict dependency locking.
+configurations.named("baselineProfile") {
+    isCanBeResolved = false
+}
+
+baselineProfile {
+    automaticGenerationDuringBuild = false
+    saveInSrc = true
+    mergeIntoMain = true
+    baselineProfileOutputDir = "generated/baselineProfiles"
+    filter {
+        include("com.foxtv.app.**")
+    }
+}
+
+sentry {
+    includeProguardMapping.set(true)
+    autoUploadProguardMapping.set(sentryMappingUploadEnabled)
+    uploadNativeSymbols.set(false)
+    autoUploadNativeSymbols.set(false)
+    includeNativeSources.set(false)
+    includeSourceContext.set(false)
+    autoUploadSourceContext.set(false)
+    includeDependenciesReport.set(false)
+    telemetry.set(false)
+    sentryAuthToken?.let(authToken::set)
+    sentryOrg?.let(org::set)
+    sentryProject?.let(projectName::set)
+    ignoredBuildTypes.set(setOf("debug"))
+    autoInstallation {
+        enabled.set(false)
+    }
+    tracingInstrumentation {
+        enabled.set(false)
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    // Source-retention nullness annotations (MonotonicNonNull / RequiresNonNull /
+    // EnsuresNonNull) used by the vendored Matroska extractor in
+    // com.foxtv.app.core.player.dvmkv. Media3 keeps these compileOnly in its own
+    // build, so they aren't on our classpath via the prebuilt AARs.
+    compileOnly(libs.checker.qual)
+
+    baselineProfile(project(":baselineprofile"))
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.profileinstaller)
+    implementation(libs.androidx.recyclerview)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.tv.material)
+    implementation(libs.androidx.tvprovider)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
+
+    // Aniyomi Jellyfin 14.17 parent-owned host ABI. extensions-lib is intentionally
+    // not packaged because it contains compile-time throwing stubs.
+    implementation(libs.androidx.preference.ktx)
+    // Injekt commit 65b04400 is vendored as Kotlin source because its thread-safety fix
+    // was never published and JitPack cannot build the historical Gradle 2 project.
+    implementation(libs.rxjava1)
+
+    // Networking
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.moshi)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.moshi)
+    ksp(libs.moshi.codegen)
+
+    // Coroutines
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
+
+    // Image Loading
+    implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.svg)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.coil.network.cache.control)
+    implementation(libs.lottie.compose)
+
+    // Navigation
+    implementation(libs.navigation.compose)
+
+    // DataStore
+    implementation(libs.datastore.preferences)
+
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Media3 — remaining stock modules from Maven (not forked)
+    implementation(libs.media3.exoplayer.hls)
+    implementation(libs.media3.exoplayer.dash)
+    implementation(libs.media3.exoplayer.smoothstreaming)
+    implementation(libs.media3.exoplayer.rtsp)
+    implementation(libs.media3.decoder)
+    implementation(libs.media3.session)
+    implementation(libs.media3.container)
+
+    // Transitive dependencies required by forked local AARs (not bundled in AARs):
+    // - Guava: needed by lib-common (ImmutableList/ImmutableSet in Tracks, Player API)
+    // - media3-database: needed by lib-datasource (cache/storage layer)
+    // - annotation-experimental: needed by lib-common (OptIn annotations)
+    implementation(libs.guava.android)
+    implementation(libs.media3.database)
+    implementation(libs.androidx.annotation.experimental)
+
+    // FoxTv Engine local AARs (replaces lib-exoplayer, lib-common, lib-datasource, lib-datasource-okhttp, lib-exoplayer-hls, lib-extractor)
+    implementation(files(
+        "libs/lib-common-release.aar",
+        "libs/lib-datasource-release.aar",
+        "libs/lib-datasource-okhttp-release.aar",
+        "libs/lib-exoplayer-release.aar",
+        "libs/lib-exoplayer-hls-release.aar",
+        "libs/lib-extractor-release.aar"
+    ))
+    implementation(libs.media3.ui)
+
+    // Local decoder AARs (AV1, IAMF, MPEG-H)
+    implementation(files(
+        "libs/lib-decoder-av1-release.aar",
+        "libs/lib-decoder-mpegh-release.aar"
+    ))
+    implementation(files("libs/lib-decoder-iamf-release.aar"))
+    if (useLocalFfmpegDecoder) {
+        implementation(project(":ffmpeg-decoder-downmix"))
+    } else {
+        implementation(files("libs/lib-decoder-ffmpeg-release.aar"))
+    }
+
+    // libass-android for ASS/SSA subtitle support (from Maven Central)
+    implementation(libs.ass.media)
+    // Local nextlib-mediainfo fork (static FFmpeg; no libav*.so in final AAR)
+    implementation(files("libs/nextlib-mediainfo-local.aar"))
+    implementation(libs.mpv.android)
+    implementation(libs.haze.android) {
+        exclude(group = "org.jetbrains.compose.ui")
+        exclude(group = "org.jetbrains.compose.foundation")
+    }
+
+    implementation(libs.gson)
+
+    implementation(files("libs/quickjs-kt-android-1.0.5-playtorrio.aar"))
+    implementation(libs.jsoup)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.module.kotlin)
+    implementation(libs.nicehttp)
+    implementation(libs.conscrypt.android)
+    // Cloudstream's ExtractorApi registry initializes Rhino classes at runtime. Keep the
+    // upstream v4.7.0 Android-compatible pin (1.9+ raises the runtime requirement).
+    implementation(libs.rhino)
+    implementation(libs.cloudstream.library) {
+        exclude(group = "org.mozilla", module = "rhino")
+        exclude(group = "com.github.AmarullisVFX", module = "newpipeextractor")
+        exclude(group = "com.github.AmaryllisVFX", module = "newpipeextractor")
+        exclude(group = "com.github.AmaryllisVFX.newpipeextractor")
+        exclude(group = "info.debatty", module = "java-string-similarity")
+    }
+
+    // Markdown rendering
+    implementation(libs.markdown.renderer.m3)
+
+    implementation(libs.crypto.js)
+    // QR code + local server for addon management
+    implementation(libs.nanohttpd)
+    implementation(libs.zxing.core)
+
+    // Supabase
+    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.auth)
+    implementation(libs.supabase.postgrest)
+    implementation(libs.supabase.storage)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.sentry.android)
+
+    // Kotlinx Serialization
+    implementation(libs.kotlinx.serialization.json)
+
+    // Performance profiling
+    implementation(libs.androidx.metrics.performance) // JankStats
+    debugImplementation(libs.androidx.compose.runtime.tracing)
+
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    testImplementation(libs.junit4)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.okhttp.mockwebserver)
+    testImplementation(libs.okhttp.tls)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+// Runtime javac in the controlled M3 fixture must see the exact Gradle test classpath.
+// Resolve it immediately before the Test action so Android variant wiring is already complete.
+tasks.withType<Test>().configureEach {
+    doFirst {
+        systemProperty("foxtv.test.runtimeClasspath", classpath.asPath)
+    }
+}

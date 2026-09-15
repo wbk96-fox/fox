@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.fanfilm.media" version="2026.06.15.0" name="FanFilm Themepack" provider-name="FF Team">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+    <extension point="xbmc.python.module" library="lib"/>
+    <extension point="xbmc.addon.metadata">
+        <summary>Themes for the FanFilm Addon</summary>
+        <description></description>
+        <platform>all</platform>
+    </extension>
+</addon>

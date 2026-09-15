@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base-locale counterparts for FOX.TV keys already present in localized overlays. -->
+    <string name="auth_notice_foxtv_logged_out">You have been signed out of FOX.TV. Please sign in again.</string>
+
+    <string name="support_foxtv_name">Support FOX.TV</string>
+    <string name="licenses_attributions_foxtv_title">FOX.TV</string>
+    <string name="licenses_attributions_foxtv_body">FOX.TV is based on PlayTorrioTVKT, whose upstream source and GPLv3 license terms are available at the linked repository.</string>
+
+    <string name="advanced_foxtv_performance_mode">ExoPlayer Native Memory</string>
+    <string name="advanced_foxtv_performance_mode_subtitle">Enables high-performance native allocation, off-heap memory, and network optimizations for smoother playback.</string>
+    <string name="advanced_foxtv_focus_scroll">FOX.TV Focus Scrolling</string>
+    <string name="advanced_foxtv_focus_scroll_subtitle">Use the FOX.TV custom global focus scroll animation and positioning.</string>
+
+    <string name="trakt_watch_progress_source_foxtv">FOX.TV Sync</string>
+    <string name="trakt_watch_progress_foxtv_selected">Watch progress source set to FOX.TV Sync</string>
+    <string name="trakt_library_source_foxtv">FOX.TV Library</string>
+    <string name="trakt_library_source_foxtv_selected">FOX.TV library selected</string>
+    <string name="library_source_foxtv">FOX.TV</string>
+
+    <string name="cd_foxtv_logo">FOX.TV logo</string>
+    <string name="cd_foxtv">FOX.TV</string>
+
+    <string name="playback_net_foxtv_performance_mode">ExoPlayer Native Memory</string>
+    <string name="playback_net_foxtv_performance_mode_sub">Enable native off-heap allocation and scrubbing optimizations.</string>
+    <string name="playback_net_foxtv_performance_mode_not_supported">This feature is not supported by your device.</string>
+</resources>
